@@ -2,71 +2,80 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Display a map on a webpage</title>
+<title>Atlas of New Cities</title>
 <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
 <style>
-body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+body {
+  margin: 0;
+  padding: 0;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
 </style>
 </head>
 <body>
 <div id="map"></div>
+
 <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiZXZnZW5peWEtZGlnaXRhbCIsImEiOiJjbW1hc2wzbDEwZnh5MnBzOXEzZmQ5Zms4In0.54xcK45nfKeeg-Z6-m7cfg';
-    const map = new mapboxgl.Map({
-        container: 'map', // container ID
-        center: [36.646339, 55.776132], // center viewport over Boston MA USA
-        style: 'mapbox://styles/evgeniya-digital/cmmatecv1006q01scb0esdbuu',
-        zoom: 9 // starting zoom
+mapboxgl.accessToken = 'pk.eyJ1IjoiZXZnZW5peWEtZGlnaXRhbCIsImEiOiJjbW1hc2wzbDEwZnh5MnBzOXEzZmQ5Zms4In0.54xcK45nfKeeg-Z6-m7cfg';
+
+const map = new mapboxgl.Map({
+  container: 'map',
+  center: [36.646339, 55.776132],
+  style: 'mapbox://styles/evgeniya-digital/cmmatecv1006q01scb0esdbuu',
+  zoom: 2
+});
+
+map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+map.on('load', () => {
+  const layers = ['new-cities-text', 'new-cities-dot'];
+
+  layers.forEach((layer, index) => {
+    map.addInteraction(`click-marker-${index}`, {
+      type: 'click',
+      target: { layerId: layer },
+      handler: (e) => {
+        new mapboxgl.Popup({ offset: [0, -15] })
+          .setLngLat(e.feature.geometry.coordinates)
+          .setHTML(`
+            <h3>${e.feature.properties.Name || ''}</h3>
+            <p>${e.feature.properties.Country || ''}</p>
+            <p>${e.feature.properties.Category || ''}</p>
+            <p>${e.feature.properties['Year of project announcement'] || ''}</p>
+            <p>${
+              e.feature.properties.website
+                ? `<a href="${e.feature.properties.website}" target="_blank">Website</a>`
+                : ''
+            }</p>
+          `)
+          .addTo(map);
+      }
     });
 
-    // Our custom layers
-  const layers = [ 'new-cities-text', 'new-cities-dot']
+    map.addInteraction(`mouse-enter-marker-${index}`, {
+      type: 'mouseenter',
+      target: { layerId: layer },
+      handler: () => {
+        map.getCanvas().style.cursor = 'pointer';
+      }
+    });
 
-  // Iterate over each layer and add our interactions
-  layers.forEach((layer, index) => {
-    
-        // Add Click interaction
-        map.addInteraction(`click-marker-${index}`, {
-            type: 'click',
-            target: { layerId: layer },
-            handler: (e) => {
-                const popup = new mapboxgl.Popup({ offset: [0, -15] })
-            .setLngLat(e.feature.geometry.coordinates)
-            .setHTML(
-                `<h3>${e.feature.properties.Name}</h3>
-                <p>${e.feature.properties.Country}</p>
-                <p>${e.feature.properties.Category}</p>
-                <p>${e.feature.properties.Year of project announcement}</p>
-                <p>${e.feature.properties.website}</p>`
-            )
-            .addTo(map);
-            }
-        });
-
-        // Add mouse-enter interaction
-        map.addInteraction(`mouse-enter-marker-${index}`, {
-            type: 'mouseenter',
-            target: { layerId: layer },
-            handler: (e) => {
-                console.log(map.style.cursor);
-                map.getCanvas().style.cursor = 'pointer';
-            }
-        });
-
-        map.addInteraction(`mouse-leave-marker-${index}`, {
-            type: 'mouseleave',
-            target: { layerId: layer },
-            handler: (e) => {
-                map.getCanvas().style.cursor = '';
-            }
-        });
-
-  })
-
+    map.addInteraction(`mouse-leave-marker-${index}`, {
+      type: 'mouseleave',
+      target: { layerId: layer },
+      handler: () => {
+        map.getCanvas().style.cursor = '';
+      }
+    });
+  });
+});
 </script>
-
 </body>
 </html>
