@@ -11,11 +11,69 @@ body {
   margin: 0;
   padding: 0;
 }
+
 #map {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 100%;
+}
+
+.mapboxgl-popup {
+  max-width: 320px;
+}
+
+.mapboxgl-popup-content {
+  padding: 0;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+.mapboxgl-popup-close-button {
+  display: none;
+}
+
+.city-popup {
+  padding: 18px 18px 14px;
+  background: #ffffff;
+  color: #1f1f1f;
+}
+
+.city-popup__title {
+  margin: 0 0 14px;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.city-popup__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+  padding: 8px 0;
+  border-top: 1px solid #ececec;
+}
+
+.city-popup__row:first-of-type {
+  border-top: 1px solid #ececec;
+}
+
+.city-popup__label {
+  font-size: 14px;
+  line-height: 1.25;
+  color: #8a8a8a;
+}
+
+.city-popup__value {
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 600;
+  color: #1f1f1f;
+  text-align: right;
 }
 </style>
 </head>
@@ -34,44 +92,83 @@ const map = new mapboxgl.Map({
 
 map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-map.on('load', () => {
-  const layers = ['new-cities-text', 'new-cities-dot'];
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
-  layers.forEach((layer, index) => {
-    map.addInteraction(`click-marker-${index}`, {
-      type: 'click',
+function formatValue(value) {
+  if (value === null || value === undefined || value === '') return '—';
+  return escapeHtml(value);
+}
+
+function buildPopupHtml(properties) {
+  const rows = [
+    ['Страна', properties['Country']],
+    ['Год анонсирования проекта', properties['Year of project announcement']],
+    ['Тип территории', properties['Category']],
+    ['Статус проекта', properties['Project status']],
+    ['Площадь, км²', properties['Area (km²)']]
+  ];
+
+  const rowsHtml = rows.map(([label, value]) => `
+    <div class="city-popup__row">
+      <div class="city-popup__label">${escapeHtml(label)}</div>
+      <div class="city-popup__value">${formatValue(value)}</div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="city-popup">
+      <h3 class="city-popup__title">${formatValue(properties['Name'])}</h3>
+      ${rowsHtml}
+    </div>
+  `;
+}
+
+map.on('load', () => {
+  const hoverLayers = ['new-cities-dot'];
+  let hoverPopup = null;
+
+  hoverLayers.forEach((layer, index) => {
+    map.addInteraction(`hover-popup-${index}`, {
+      type: 'mouseenter',
       target: { layerId: layer },
       handler: (e) => {
-        new mapboxgl.Popup({ offset: [0, -15] })
-          .setLngLat(e.feature.geometry.coordinates)
-          .setHTML(`
-            <h3>${e.feature.properties.Name || ''}</h3>
-            <p>${e.feature.properties.Country || ''}</p>
-            <p>${e.feature.properties.Category || ''}</p>
-            <p>${e.feature.properties['Year of project announcement'] || ''}</p>
-            <p>${
-              e.feature.properties.website
-                ? `<a href="${e.feature.properties.website}" target="_blank">Website</a>`
-                : ''
-            }</p>
-          `)
+        map.getCanvas().style.cursor = 'pointer';
+
+        const coordinates = [...e.feature.geometry.coordinates];
+        const properties = e.feature.properties || {};
+
+        if (hoverPopup) {
+          hoverPopup.remove();
+        }
+
+        hoverPopup = new mapboxgl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+          offset: [0, -14],
+          className: 'city-hover-popup'
+        })
+          .setLngLat(coordinates)
+          .setHTML(buildPopupHtml(properties))
           .addTo(map);
       }
     });
 
-    map.addInteraction(`mouse-enter-marker-${index}`, {
-      type: 'mouseenter',
-      target: { layerId: layer },
-      handler: () => {
-        map.getCanvas().style.cursor = 'pointer';
-      }
-    });
-
-    map.addInteraction(`mouse-leave-marker-${index}`, {
+    map.addInteraction(`hover-leave-${index}`, {
       type: 'mouseleave',
       target: { layerId: layer },
       handler: () => {
         map.getCanvas().style.cursor = '';
+        if (hoverPopup) {
+          hoverPopup.remove();
+          hoverPopup = null;
+        }
       }
     });
   });
