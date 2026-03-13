@@ -200,47 +200,56 @@ function buildPopupHtml(properties) {
   `;
 }
 
-let selectedFeatureId = null;
 let activePopup = null;
 
 map.on('load', () => {
-  map.setPaintProperty(
-    'new-cities-dot',
-    'circle-color',
-    [
-      'case',
-      ['boolean', ['feature-state', 'selected'], false],
-      '#2F6BFF',
-      '#000000'
-    ]
-  );
+  /* отдельный source для активной синей точки */
+  map.addSource('selected-city', {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: []
+    }
+  });
 
-  map.addInteraction('click-city-popup', {
+  map.addLayer({
+    id: 'selected-city-dot',
+    type: 'circle',
+    source: 'selected-city',
+    paint: {
+      'circle-radius': 5,
+      'circle-color': '#2F6BFF'
+    }
+  });
+
+  map.addInteraction('city-click-popup', {
     type: 'click',
     target: { layerId: 'new-cities-dot' },
     handler: (e) => {
       const feature = e.feature;
       const coordinates = [...feature.geometry.coordinates];
       const properties = feature.properties || {};
-      const source = feature.source;
-      const id = feature.id;
 
       map.getCanvas().style.cursor = 'pointer';
 
-      if (selectedFeatureId !== null) {
-        map.setFeatureState(
-          { source, id: selectedFeatureId },
-          { selected: false }
-        );
-      }
+      /* обновляем синюю точку */
+      const selectedCityData = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates
+            },
+            properties: {}
+          }
+        ]
+      };
 
-      selectedFeatureId = id;
+      map.getSource('selected-city').setData(selectedCityData);
 
-      map.setFeatureState(
-        { source, id: selectedFeatureId },
-        { selected: true }
-      );
-
+      /* открываем popup */
       if (activePopup) {
         activePopup.remove();
       }
@@ -256,18 +265,16 @@ map.on('load', () => {
         .addTo(map);
 
       activePopup.on('close', () => {
-        if (selectedFeatureId !== null) {
-          map.setFeatureState(
-            { source, id: selectedFeatureId },
-            { selected: false }
-          );
-        }
-        selectedFeatureId = null;
+        map.getSource('selected-city').setData({
+          type: 'FeatureCollection',
+          features: []
+        });
         activePopup = null;
       });
     }
   });
 
+  /* только курсор по hover */
   map.addInteraction('city-pointer-enter', {
     type: 'mouseenter',
     target: { layerId: 'new-cities-dot' },
