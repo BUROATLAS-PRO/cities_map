@@ -50,7 +50,7 @@
 
   .top-ui{
     display:grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 230px 1fr;
     gap:0;
     padding:0;
     align-items:start;
@@ -60,17 +60,20 @@
   }
 
   .legend-panel{
-    min-height:84px;
+    min-height:104px;
     background:var(--panel);
     border:none;
-    padding:12px 16px 10px 0;
+    padding:8px 12px 8px 0;
     margin:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
   }
 
   .legend-title{
-    margin:0 0 8px;
-    font-size:14px;
-    line-height:1.2;
+    margin:0 0 6px;
+    font-size:12px;
+    line-height:1.15;
     font-weight:400;
     color:#000000;
     font-family:var(--font-main);
@@ -79,33 +82,33 @@
   .legend-items{
     display:flex;
     flex-direction:column;
-    gap:4px;
+    gap:3px;
   }
 
   .legend-item{
     display:flex;
     align-items:center;
-    gap:8px;
-    font-size:12px;
-    line-height:1.2;
+    gap:7px;
+    font-size:10px;
+    line-height:1.1;
     color:var(--text);
     font-family:var(--font-main);
   }
 
   .legend-dot{
-    width:10px;
-    height:10px;
+    width:8px;
+    height:8px;
     border-radius:50%;
-    flex:0 0 10px;
+    flex:0 0 8px;
     background:#cfcfcf;
   }
 
   .legend-size-row{
     display:flex;
     align-items:center;
-    gap:10px;
-    margin-top:6px;
-    font-size:12px;
+    gap:8px;
+    margin-top:4px;
+    font-size:10px;
     color:var(--text);
     font-family:var(--font-main);
   }
@@ -134,6 +137,7 @@
     appearance:none;
     border-radius:var(--radius);
     margin:0;
+    overflow:hidden;
   }
 
   .tab.is-active{
@@ -142,17 +146,30 @@
   }
 
   .tab-preview{
-    height:46px;
+    position:relative;
+    height:104px;
     background-color:var(--preview);
-    background-size:cover;
-    background-position:center;
+    background-size:contain;
+    background-position:center center;
     background-repeat:no-repeat;
-    border-top-left-radius:var(--preview-radius);
-    border-top-right-radius:var(--preview-radius);
+    border-radius:var(--preview-radius);
+    display:flex;
+    align-items:flex-end;
+    justify-content:flex-start;
+  }
+
+  .tab-preview::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:transparent;
   }
 
   .tab-label-wrap{
-    padding:8px 12px 10px;
+    position:relative;
+    z-index:1;
+    width:100%;
+    padding:10px 12px 10px;
     background:transparent;
   }
 
@@ -164,8 +181,9 @@
     display:block;
     font-size:12px;
     color:#000000;
-    line-height:1.15;
+    line-height:1.1;
     font-family:var(--font-main);
+    background:transparent;
   }
 
   .map-wrap{
@@ -384,7 +402,7 @@ const MODES = {
   area: {
     key: 'area',
     label: 'Площадь',
-    legendTitle: 'Площадь, КМ²',
+    legendTitle: 'Площадь, км²',
     type: 'size',
     property: 'Area (km²)',
     preview: './previews/area.png',
@@ -436,7 +454,7 @@ function buildPopupHtml(properties){
     ["Анонсирован",properties["Year of project announcement"]],
     ["Тип территории",properties["Category"]],
     ["Статус проекта",properties["Project status"]],
-    ["Площадь, КМ²",properties["Area (km²)"]]
+    ["Площадь, км²",properties["Area (km²)"]]
   ];
 
   const rowsHtml = rows.map(([label,value]) => `
@@ -478,9 +496,10 @@ function renderTabs(){
       : '';
 
     btn.innerHTML = `
-      <div class="tab-preview" style="${previewStyle}"></div>
-      <div class="tab-label-wrap">
-        <span class="tab-mode-label">${mode.label}</span>
+      <div class="tab-preview" style="${previewStyle}">
+        <div class="tab-label-wrap">
+          <span class="tab-mode-label">${mode.label}</span>
+        </div>
       </div>
     `;
 
@@ -534,14 +553,14 @@ function renderLegend(){
   }
 }
 
-function getDefaultRadiusExpression(){
+function getLargeDefaultRadiusExpression(){
   return [
     'interpolate',
     ['linear'],
     ['zoom'],
-    0, 1.5,
-    6, 2.5,
-    10, 4
+    0, 3,
+    6, 5,
+    10, 8
   ];
 }
 
@@ -572,7 +591,7 @@ function applyMode(){
   if (activeMode === 'allCities') {
     map.setPaintProperty('new-cities-dot', 'circle-color', '#111111');
     map.setPaintProperty('new-cities-dot', 'circle-opacity', 1);
-    map.setPaintProperty('new-cities-dot', 'circle-radius', getDefaultRadiusExpression());
+    map.setPaintProperty('new-cities-dot', 'circle-radius', getLargeDefaultRadiusExpression());
   }
 
   if (activeMode === 'cityType') {
@@ -582,7 +601,7 @@ function applyMode(){
       categoricalColorExpression(MODES.cityType.property, MODES.cityType.colors, '#d0d0d0')
     );
     map.setPaintProperty('new-cities-dot', 'circle-opacity', 1);
-    map.setPaintProperty('new-cities-dot', 'circle-radius', getDefaultRadiusExpression());
+    map.setPaintProperty('new-cities-dot', 'circle-radius', getLargeDefaultRadiusExpression());
   }
 
   if (activeMode === 'projectStatus') {
@@ -592,7 +611,7 @@ function applyMode(){
       categoricalColorExpression(MODES.projectStatus.property, MODES.projectStatus.colors, '#d0d0d0')
     );
     map.setPaintProperty('new-cities-dot', 'circle-opacity', 1);
-    map.setPaintProperty('new-cities-dot', 'circle-radius', getDefaultRadiusExpression());
+    map.setPaintProperty('new-cities-dot', 'circle-radius', getLargeDefaultRadiusExpression());
   }
 
   if (activeMode === 'area') {
@@ -617,7 +636,7 @@ map.on('load', () => {
     type:'circle',
     source:'selected-city',
     paint:{
-      'circle-radius':4,
+      'circle-radius':5,
       'circle-color':'#2F6BFF'
     }
   });
