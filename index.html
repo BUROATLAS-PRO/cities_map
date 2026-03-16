@@ -50,8 +50,8 @@
 
   .top-ui{
     display:grid;
-    grid-template-columns: 230px 1fr;
-    gap:0;
+    grid-template-columns: 200px 1fr;
+    gap:10px;
     padding:0;
     align-items:start;
     z-index:2;
@@ -60,10 +60,10 @@
   }
 
   .legend-panel{
-    min-height:104px;
+    min-height:84px;
     background:var(--panel);
     border:none;
-    padding:8px 12px 8px 0;
+    padding:6px 10px 6px 0;
     margin:0;
     display:flex;
     flex-direction:column;
@@ -71,8 +71,8 @@
   }
 
   .legend-title{
-    margin:0 0 6px;
-    font-size:12px;
+    margin:0 0 5px;
+    font-size:11px;
     line-height:1.15;
     font-weight:400;
     color:#000000;
@@ -141,18 +141,19 @@
   }
 
   .tab.is-active{
+    background:#ffffff !important;
     border-color:var(--line);
-    background:#ffffff;
   }
 
   .tab-preview{
     position:relative;
-    height:104px;
+    height:84px;
     background-color:var(--preview);
     background-size:contain;
     background-position:center center;
     background-repeat:no-repeat;
-    border-radius:var(--preview-radius);
+    border-top-left-radius:var(--preview-radius);
+    border-top-right-radius:var(--preview-radius);
     display:flex;
     align-items:flex-end;
     justify-content:flex-start;
@@ -166,24 +167,21 @@
   }
 
   .tab-label-wrap{
-    position:relative;
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
     z-index:1;
-    width:100%;
-    padding:10px 12px 10px;
+    padding:8px 12px 8px;
     background:transparent;
-  }
-
-  .tab-map-title{
-    display:none;
   }
 
   .tab-mode-label{
     display:block;
-    font-size:12px;
+    font-size:11px;
     color:#000000;
     line-height:1.1;
     font-family:var(--font-main);
-    background:transparent;
   }
 
   .map-wrap{
