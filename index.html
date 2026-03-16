@@ -9,6 +9,24 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
 
 <style>
+:root {
+  --popup-max-width: 280px;
+  --popup-padding-y: 10px;
+  --popup-padding-x: 12px;
+  --popup-radius: 6px;
+  --popup-title-size: 14px;
+  --popup-ext-size: 10px;
+  --popup-label-size: 9px;
+  --popup-value-size: 10px;
+  --popup-row-gap: 8px;
+  --popup-row-padding: 5px;
+  --popup-col-left: 92px;
+  --popup-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  --tooltip-font-size: 10px;
+  --tooltip-padding-y: 4px;
+  --tooltip-padding-x: 6px;
+}
+
 body{
   margin:0;
   padding:0;
@@ -22,29 +40,27 @@ body{
 
 /* popup */
 .mapboxgl-popup{
-  max-width:300px;
+  max-width: var(--popup-max-width);
 }
 
 .mapboxgl-popup-content{
   padding:0;
-  border-radius:6px;
+  border-radius:var(--popup-radius);
   border:1px solid rgba(0,0,0,0.08);
-  box-shadow:0 8px 18px rgba(0,0,0,0.12);
+  box-shadow:var(--popup-shadow);
   background:white;
   overflow:hidden;
 }
 
-/* popup layout */
 .city-popup{
-  padding:10px 12px;
+  padding:var(--popup-padding-y) var(--popup-padding-x);
   font-family:Arial,sans-serif;
   color:#1a1a1a;
 }
 
-/* title */
 .city-popup__title{
   margin:0 0 6px;
-  font-size:9px;
+  font-size:var(--popup-title-size);
   line-height:1.2;
   font-weight:700;
 }
@@ -56,7 +72,7 @@ body{
 
 .city-popup__ext{
   display:inline-block;
-  font-size:8px;
+  font-size:var(--popup-ext-size);
   margin-left:3px;
   color:#777;
   border-bottom:1px solid #888;
@@ -64,7 +80,6 @@ body{
   transform:translateY(-1px);
 }
 
-/* table */
 .city-popup__table{
   border-top:1px solid #ececec;
   margin-top:4px;
@@ -72,9 +87,9 @@ body{
 
 .city-popup__row{
   display:grid;
-  grid-template-columns:92px 1fr;
-  gap:8px;
-  padding:5px 0;
+  grid-template-columns: var(--popup-col-left) 1fr;
+  gap:var(--popup-row-gap);
+  padding:var(--popup-row-padding) 0;
   border-top:1px solid #f0f0f0;
 }
 
@@ -82,16 +97,14 @@ body{
   border-top:none;
 }
 
-/* labels */
 .city-popup__label{
-  font-size:6px;
+  font-size:var(--popup-label-size);
   color:#8c8c8c;
   line-height:1.3;
 }
 
-/* values */
 .city-popup__value{
-  font-size:6px;
+  font-size:var(--popup-value-size);
   font-weight:600;
   color:#1f1f1f;
   text-align:left;
@@ -105,14 +118,14 @@ body{
 }
 
 .city-hover-tooltip .mapboxgl-popup-content{
-  padding:4px 6px;
+  padding:var(--tooltip-padding-y) var(--tooltip-padding-x);
   border-radius:4px;
   border:none;
   box-shadow:0 3px 10px rgba(0,0,0,0.18);
   background:rgba(0,0,0,0.85);
   color:white;
   font-family:Arial,sans-serif;
-  font-size:10px;
+  font-size:var(--tooltip-font-size);
   line-height:1.2;
 }
 
@@ -132,7 +145,7 @@ body{
 <script>
 mapboxgl.accessToken='pk.eyJ1IjoiZXZnZW5peWEtZGlnaXRhbCIsImEiOiJjbW1hc2wzbDEwZnh5MnBzOXEzZmQ5Zms4In0.54xcK45nfKeeg-Z6-m7cfg';
 
-const map=new mapboxgl.Map({
+const map = new mapboxgl.Map({
   container:'map',
   center:[15,18],
   zoom:1.1,
@@ -141,6 +154,56 @@ const map=new mapboxgl.Map({
 
 map.addControl(new mapboxgl.NavigationControl(),'top-right');
 map.scrollZoom.disable();
+
+let popup = null;
+let tooltip = null;
+
+function getUIScale() {
+  const w = window.innerWidth;
+
+  if (w >= 1700) return 1;
+  if (w >= 1500) return 0.94;
+  if (w >= 1300) return 0.88;
+  if (w >= 1100) return 0.8;
+  if (w >= 900) return 0.72;
+  return 0.64;
+}
+
+function applyUIScale() {
+  const s = getUIScale();
+  const root = document.documentElement;
+
+  root.style.setProperty('--popup-max-width', `${Math.round(280 * s)}px`);
+  root.style.setProperty('--popup-padding-y', `${Math.round(10 * s)}px`);
+  root.style.setProperty('--popup-padding-x', `${Math.round(12 * s)}px`);
+  root.style.setProperty('--popup-radius', `${Math.max(4, Math.round(6 * s))}px`);
+  root.style.setProperty('--popup-title-size', `${Math.max(11, 14 * s)}px`);
+  root.style.setProperty('--popup-ext-size', `${Math.max(8, 10 * s)}px`);
+  root.style.setProperty('--popup-label-size', `${Math.max(7, 9 * s)}px`);
+  root.style.setProperty('--popup-value-size', `${Math.max(8, 10 * s)}px`);
+  root.style.setProperty('--popup-row-gap', `${Math.max(6, Math.round(8 * s))}px`);
+  root.style.setProperty('--popup-row-padding', `${Math.max(4, Math.round(5 * s))}px`);
+  root.style.setProperty('--popup-col-left', `${Math.max(76, Math.round(92 * s))}px`);
+  root.style.setProperty('--tooltip-font-size', `${Math.max(9, 10 * s)}px`);
+  root.style.setProperty('--tooltip-padding-y', `${Math.max(3, Math.round(4 * s))}px`);
+  root.style.setProperty('--tooltip-padding-x', `${Math.max(5, Math.round(6 * s))}px`);
+}
+
+function getCircleRadiusExpression() {
+  const s = getUIScale();
+  return [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    0, 3 * s,
+    6, 5 * s,
+    10, 7 * s
+  ];
+}
+
+function getSelectedCircleRadius() {
+  return Math.max(4, 5 * getUIScale());
+}
 
 function escapeHtml(value){
   return String(value ?? '')
@@ -158,32 +221,32 @@ function formatValue(value){
 
 function normalizeUrl(url){
   if(!url) return "";
-  const trimmed=String(url).trim();
+  const trimmed = String(url).trim();
   if(!trimmed) return "";
   if(/^https?:\/\//i.test(trimmed)) return trimmed;
-  return "https://"+trimmed;
+  return "https://" + trimmed;
 }
 
 function buildPopupHtml(properties){
-  const rows=[
-    ["Страна",properties["Country"]],
-    ["Анонсирован",properties["Year of project announcement"]],
-    ["Тип территории",properties["Category"]],
-    ["Статус проекта",properties["Project status"]],
-    ["Площадь, км²",properties["Area (km²)"]]
+  const rows = [
+    ["Страна", properties["Country"]],
+    ["Анонсирован", properties["Year of project announcement"]],
+    ["Тип территории", properties["Category"]],
+    ["Статус проекта", properties["Project status"]],
+    ["Площадь, км²", properties["Area (km²)"]]
   ];
 
-  const rowsHtml=rows.map(([label,value])=>`
+  const rowsHtml = rows.map(([label,value]) => `
     <div class="city-popup__row">
       <div class="city-popup__label">${escapeHtml(label)}</div>
       <div class="city-popup__value">${formatValue(value)}</div>
     </div>
   `).join("");
 
-  const title=formatValue(properties["Name"]);
-  const website=normalizeUrl(properties["website"]);
+  const title = formatValue(properties["Name"]);
+  const website = normalizeUrl(properties["website"]);
 
-  const titleHtml=website
+  const titleHtml = website
     ? `<a href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer">${title}<span class="city-popup__ext">↗</span></a>`
     : title;
 
@@ -197,22 +260,25 @@ function buildPopupHtml(properties){
   `;
 }
 
-let popup=null;
-let tooltip=null;
+function updateMapSizing() {
+  applyUIScale();
 
-map.on('load',()=>{
+  if (map.getLayer('new-cities-dot')) {
+    map.setPaintProperty('new-cities-dot', 'circle-radius', getCircleRadiusExpression());
+  }
 
+  if (map.getLayer('selected-city-dot')) {
+    map.setPaintProperty('selected-city-dot', 'circle-radius', getSelectedCircleRadius());
+  }
+}
+
+applyUIScale();
+
+map.on('load', () => {
   map.setPaintProperty(
     'new-cities-dot',
     'circle-radius',
-    [
-      'interpolate',
-      ['linear'],
-      ['zoom'],
-      0,4,
-      6,6,
-      10,8
-    ]
+    getCircleRadiusExpression()
   );
 
   map.addSource('selected-city',{
@@ -228,7 +294,7 @@ map.on('load',()=>{
     type:'circle',
     source:'selected-city',
     paint:{
-      'circle-radius':7,
+      'circle-radius': getSelectedCircleRadius(),
       'circle-color':'#2F6BFF'
     }
   });
@@ -239,13 +305,13 @@ map.on('load',()=>{
     handler:(e)=>{
       map.getCanvas().style.cursor='pointer';
 
-      const feature=e.feature;
-      const coordinates=[...feature.geometry.coordinates];
-      const name=feature.properties.Name;
+      const feature = e.feature;
+      const coordinates = [...feature.geometry.coordinates];
+      const name = feature.properties.Name;
 
       if(tooltip) tooltip.remove();
 
-      tooltip=new mapboxgl.Popup({
+      tooltip = new mapboxgl.Popup({
         closeButton:false,
         closeOnClick:false,
         offset:[0,-10],
@@ -265,7 +331,7 @@ map.on('load',()=>{
 
       if(tooltip){
         tooltip.remove();
-        tooltip=null;
+        tooltip = null;
       }
     }
   });
@@ -274,13 +340,13 @@ map.on('load',()=>{
     type:"click",
     target:{layerId:"new-cities-dot"},
     handler:(e)=>{
-      const feature=e.feature;
-      const coordinates=[...feature.geometry.coordinates];
-      const properties=feature.properties;
+      const feature = e.feature;
+      const coordinates = [...feature.geometry.coordinates];
+      const properties = feature.properties;
 
       if(tooltip){
         tooltip.remove();
-        tooltip=null;
+        tooltip = null;
       }
 
       map.getSource('selected-city').setData({
@@ -296,16 +362,20 @@ map.on('load',()=>{
 
       if(popup) popup.remove();
 
-      popup=new mapboxgl.Popup({
+      popup = new mapboxgl.Popup({
         offset:[0,-12],
-        maxWidth:'300px'
+        maxWidth:getComputedStyle(document.documentElement).getPropertyValue('--popup-max-width').trim()
       })
       .setLngLat(coordinates)
       .setHTML(buildPopupHtml(properties))
       .addTo(map);
     }
   });
+});
 
+window.addEventListener('resize', () => {
+  updateMapSizing();
+  map.resize();
 });
 </script>
 </body>
