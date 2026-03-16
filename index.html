@@ -9,243 +9,135 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
 
 <style>
-
 :root{
---bg:#ffffff;
---text:#000000;
---muted:#6f6f6f;
---line:#d9d9d9;
---panel:#ffffff;
---panel-inactive:#f2f2f2;
---preview:#d9d9d9;
---radius:5px;
---preview-radius:3px;
---font-main:"Forma DJR Cyrillic Text","Forma DJR Cyrillic","Inter","Arial",sans-serif;
+  --bg:#ffffff;
+  --text:#000000;
+  --muted:#6f6f6f;
+  --line:#d9d9d9;
+  --panel:#ffffff;
+  --panel-inactive:#f2f2f2;
+  --preview:#d9d9d9;
+  --radius:5px;
+  --preview-radius:3px;
+  --font-main:"Forma DJR Cyrillic Text","Forma DJR Cyrillic","Inter","Arial",sans-serif;
 }
 
 *{box-sizing:border-box;}
 
 html,body{
-margin:0;
-padding:0;
-width:100%;
-height:100%;
-background:var(--bg);
-font-family:var(--font-main);
-color:var(--text);
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  background:var(--bg);
+  font-family:var(--font-main);
+  color:var(--text);
 }
 
 body{overflow:hidden;}
 
 .app{
-width:100%;
-height:100%;
-display:flex;
-flex-direction:column;
-background:var(--bg);
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:var(--bg);
 }
 
 .top-ui{
-display:grid;
-grid-template-columns:200px 1fr;
-gap:10px;
-padding:0;
-align-items:start;
-z-index:2;
-flex:0 0 auto;
-margin:0;
+  display:grid;
+  grid-template-columns:200px 1fr;
+  gap:10px;
+  padding:0;
+  align-items:start;
+  z-index:2;
+  flex:0 0 auto;
+  margin:0;
 }
 
-/* ---------- legend ---------- */
-
 .legend-panel{
-min-height:70px;
-background:var(--panel);
-border:none;
-padding:6px 10px 6px 0;
-display:flex;
-flex-direction:column;
+  min-height:70px;
+  background:var(--panel);
+  border:none;
+  padding:6px 10px 6px 0;
+  display:flex;
+  flex-direction:column;
 }
 
 .legend-title{
-margin:0 0 5px;
-font-size:11px;
-line-height:1.15;
-font-weight:400;
+  margin:0 0 5px;
+  font-size:11px;
+  line-height:1.15;
+  font-weight:400;
+  color:#000;
 }
-
-.legend-items{
-display:flex;
-flex-direction:column;
-gap:3px;
-}
-
-.legend-item{
-display:flex;
-align-items:center;
-gap:7px;
-font-size:10px;
-line-height:1.1;
-}
-
-.legend-dot{
-width:8px;
-height:8px;
-border-radius:50%;
-flex:0 0 8px;
-background:#cfcfcf;
-}
-
-.legend-size-row{
-display:flex;
-align-items:center;
-gap:8px;
-margin-top:4px;
-font-size:10px;
-}
-
-.size-dot{
-border-radius:50%;
-background:#cfcfcf;
-}
-
-/* ---------- tabs ---------- */
 
 .tabs{
-display:grid;
-grid-template-columns:repeat(4,minmax(140px,1fr));
-gap:0;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(140px,1fr));
+  gap:0;
 }
 
 .tab{
-border:1px solid var(--line);
-background:var(--panel-inactive);
-cursor:pointer;
-padding:0;
-text-align:left;
-border-radius:var(--radius);
-overflow:hidden;
-transition:background .15s;
+  border:1px solid var(--line);
+  background:var(--panel-inactive);
+  cursor:pointer;
+  padding:0;
+  text-align:left;
+  border-radius:var(--radius);
+  overflow:hidden;
+  appearance:none;
 }
-
-/* активная карточка */
 
 .tab.is-active{
-background:#ffffff !important;
-border-color:var(--line);
+  background:#ffffff !important;
+  border-color:var(--line);
 }
 
-/* ВАЖНО: делает картинку на белом фоне */
-
 .tab.is-active .tab-preview{
-background-color:#ffffff;
+  background-color:#ffffff;
 }
 
 .tab-preview{
-position:relative;
-height:70px;
-background-color:transparent;
-background-size:contain;
-background-position:center;
-background-repeat:no-repeat;
-border-top-left-radius:var(--preview-radius);
-border-top-right-radius:var(--preview-radius);
-display:flex;
-align-items:flex-end;
+  position:relative;
+  height:70px;
+  background-color:var(--preview);
+  background-size:contain;
+  background-position:center center;
+  background-repeat:no-repeat;
+  border-top-left-radius:var(--preview-radius);
+  border-top-right-radius:var(--preview-radius);
+  display:flex;
+  align-items:flex-end;
 }
 
 .tab-label-wrap{
-position:absolute;
-left:0;
-right:0;
-bottom:0;
-padding:8px 12px;
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  padding:8px 12px;
 }
 
 .tab-mode-label{
-font-size:11px;
-color:#000;
+  font-size:11px;
+  color:#000;
 }
 
-/* ---------- map ---------- */
-
 .map-wrap{
-position:relative;
-flex:1 1 auto;
-min-height:300px;
-margin:10px;
-margin-top:80px;
+  position:relative;
+  flex:1 1 auto;
+  min-height:300px;
+  margin:10px;
+  margin-top:8px;
 }
 
 #map{
-width:100%;
-height:100%;
-background:#fff;
+  width:100%;
+  height:100%;
+  min-height:300px;
+  background:#fff;
 }
-
-/* ---------- popup ---------- */
-
-.mapboxgl-popup{
-max-width:400px;
-}
-
-.mapboxgl-popup-content{
-padding:0;
-border-radius:8px;
-border:1px solid rgba(0,0,0,0.08);
-box-shadow:0 8px 18px rgba(0,0,0,0.14);
-background:white;
-overflow:hidden;
-}
-
-.city-popup{
-padding:14px 16px;
-color:#1a1a1a;
-}
-
-.city-popup__title{
-margin:0 0 8px;
-font-size:18px;
-font-weight:700;
-}
-
-.city-popup__title a{
-color:#1a1a1a;
-text-decoration:none;
-}
-
-.city-popup__ext{
-font-size:12px;
-margin-left:4px;
-border-bottom:1px solid #888;
-}
-
-.city-popup__table{
-border-top:1px solid #ececec;
-margin-top:4px;
-}
-
-.city-popup__row{
-display:grid;
-grid-template-columns:140px 1fr;
-gap:12px;
-padding:8px 0;
-border-top:1px solid #f0f0f0;
-}
-
-.city-popup__row:first-child{border-top:none;}
-
-.city-popup__label{
-font-size:13px;
-color:#8c8c8c;
-}
-
-.city-popup__value{
-font-size:13px;
-font-weight:600;
-text-align:left;
-}
-
 </style>
 </head>
 
@@ -256,13 +148,44 @@ text-align:left;
 <div class="top-ui">
 
 <div class="legend-panel">
-<h3 class="legend-title" id="legend-title">Все города</h3>
-<div class="legend-items" id="legend-items"></div>
-<div class="legend-size-row" id="legend-size-row" style="display:none;"></div>
+<h3 class="legend-title">Все города</h3>
 </div>
 
-<div class="tabs" id="tabs"></div>
+<div class="tabs">
 
+<button class="tab is-active">
+<div class="tab-preview">
+<div class="tab-label-wrap">
+<span class="tab-mode-label">Все города</span>
+</div>
+</div>
+</button>
+
+<button class="tab">
+<div class="tab-preview">
+<div class="tab-label-wrap">
+<span class="tab-mode-label">Тип города</span>
+</div>
+</div>
+</button>
+
+<button class="tab">
+<div class="tab-preview">
+<div class="tab-label-wrap">
+<span class="tab-mode-label">Статус проекта</span>
+</div>
+</div>
+</button>
+
+<button class="tab">
+<div class="tab-preview">
+<div class="tab-label-wrap">
+<span class="tab-mode-label">Площадь</span>
+</div>
+</div>
+</button>
+
+</div>
 </div>
 
 <div class="map-wrap">
@@ -273,96 +196,16 @@ text-align:left;
 
 <script>
 
-mapboxgl.accessToken='pk.eyJ1IjoiZXZnZW5peWEtZGlnaXRhbCIsImEiOiJjbW1hc2wzbDEwZnh5MnBzOXEzZmQ5Zms4In0.54xcK45nfKeeg-Z6-m7cfg';
+mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
 
-const MODES={
-allCities:{key:'allCities',label:'Все города',legendTitle:'Все города',type:'fixed'},
-cityType:{
-key:'cityType',
-label:'Тип города',
-legendTitle:'Тип города',
-type:'categorical',
-property:'Category',
-colors:{
-'new city':'#C78B28',
-'satellite city':'#FEC042'
-},
-legend:[
-{label:'новый город',color:'#C78B28'},
-{label:'город-спутник',color:'#FEC042'}
-]
-},
-projectStatus:{
-key:'projectStatus',
-label:'Статус проекта',
-legendTitle:'Статус проекта',
-type:'categorical',
-property:'Project status',
-colors:{
-'active':'#ACCA71',
-'implemented':'#4984AC',
-'speculative':'#B3B3B3',
-'under development':'#FEA54D'
-},
-legend:[
-{label:'active',color:'#ACCA71'},
-{label:'implemented',color:'#4984AC'},
-{label:'speculative',color:'#B3B3B3'},
-{label:'under development',color:'#FEA54D'}
-]
-},
-area:{
-key:'area',
-label:'Площадь',
-legendTitle:'Площадь, км²',
-type:'size',
-property:'Area (km²)',
-color:'#4984AC'
-}
-};
-
-let activeMode='allCities';
-
-const map=new mapboxgl.Map({
+const map = new mapboxgl.Map({
 container:'map',
 center:[15,18],
 zoom:1.1,
-style:'mapbox://styles/evgeniya-digital/cmmatecv1006q01scb0esdbuu'
+style:'mapbox://styles/mapbox/light-v11'
 });
 
-map.scrollZoom.disable();
-
-function renderTabs(){
-
-const tabs=document.getElementById('tabs');
-tabs.innerHTML='';
-
-Object.values(MODES).forEach(mode=>{
-
-const btn=document.createElement('button');
-
-btn.className=`tab ${activeMode===mode.key?'is-active':''}`;
-
-btn.innerHTML=`
-<div class="tab-preview">
-<div class="tab-label-wrap">
-<span class="tab-mode-label">${mode.label}</span>
-</div>
-</div>
-`;
-
-btn.onclick=()=>{
-activeMode=mode.key;
-renderTabs();
-};
-
-tabs.appendChild(btn);
-
-});
-
-}
-
-renderTabs();
+map.addControl(new mapboxgl.NavigationControl(),'top-right');
 
 </script>
 
