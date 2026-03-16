@@ -9,357 +9,345 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
 
 <style>
-body {
-  margin: 0;
-  padding: 0;
+
+body{
+margin:0;
+padding:0;
 }
 
-#map {
-  position: absolute;
-  inset: 0;
-  width: 100%;
+#map{
+position:absolute;
+inset:0;
+width:100%;
 }
 
-/* ---------- main popup ---------- */
+/* popup */
 
-.mapboxgl-popup {
-  max-width: 440px;
+.mapboxgl-popup{
+max-width:420px;
 }
 
-.mapboxgl-popup-content {
-  padding: 0;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.16);
-  overflow: hidden;
-  background: #fff;
+.mapboxgl-popup-content{
+padding:0;
+border-radius:8px;
+border:1px solid rgba(0,0,0,0.08);
+box-shadow:0 10px 24px rgba(0,0,0,0.14);
+background:white;
+overflow:hidden;
 }
 
-.city-popup {
-  padding: 20px;
-  background: #fff;
-  color: #1a1a1a;
-  font-family: Arial, sans-serif;
+/* popup layout */
+
+.city-popup{
+padding:16px 18px;
+font-family:Arial,sans-serif;
+color:#1a1a1a;
 }
 
-.city-popup__title {
-  margin: 0 0 14px;
-  font-size: 24px;
-  line-height: 1.15;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+/* title */
+
+.city-popup__title{
+margin:0 0 10px;
+font-size:18px;
+line-height:1.2;
+font-weight:600;
 }
 
-.city-popup__title a {
-  color: #1a1a1a;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.city-popup__title a{
+color:#1a1a1a;
+text-decoration:none;
 }
 
-.city-popup__title a:hover {
-  opacity: 0.8;
+.city-popup__ext{
+font-size:12px;
+margin-left:4px;
+border-bottom:1px solid #888;
+color:#777;
 }
 
-.city-popup__ext {
-  font-size: 14px;
-  color: #8a8a8a;
-  margin-left: 6px;
-  vertical-align: middle;
+/* table */
+
+.city-popup__table{
+border-top:1px solid #ececec;
+margin-top:6px;
 }
 
-.city-popup__table {
-  border-top: 1px solid #e8e8e8;
+.city-popup__row{
+display:grid;
+grid-template-columns:150px 1fr;
+gap:14px;
+padding:8px 0;
+border-top:1px solid #f0f0f0;
 }
 
-.city-popup__row {
-  display: grid;
-  grid-template-columns: 170px 1fr;
-  column-gap: 16px;
-  align-items: start;
-  padding: 10px 0;
-  border-top: 1px solid #efefef;
+.city-popup__row:first-child{
+border-top:none;
 }
 
-.city-popup__row:first-child {
-  border-top: none;
+/* labels */
+
+.city-popup__label{
+font-size:11px;
+color:#8c8c8c;
 }
 
-.city-popup__label {
-  font-size: 13px;
-  line-height: 1.3;
-  color: #8b8b8b;
+/* values */
+
+.city-popup__value{
+font-size:12px;
+font-weight:600;
+color:#1f1f1f;
+text-align:left;
+overflow-wrap:anywhere;
 }
 
-.city-popup__value {
-  font-size: 13px;
-  line-height: 1.35;
-  font-weight: 600;
-  color: #1f1f1f;
-  text-align: left;
-  overflow-wrap: anywhere;
+/* hover tooltip */
+
+.city-hover-tooltip.mapboxgl-popup{
+max-width:200px;
 }
 
-/* ---------- hover tooltip ---------- */
-
-.city-hover-tooltip.mapboxgl-popup {
-  max-width: 220px;
+.city-hover-tooltip .mapboxgl-popup-content{
+padding:5px 8px;
+border-radius:4px;
+border:none;
+box-shadow:0 3px 10px rgba(0,0,0,0.18);
+background:rgba(0,0,0,0.85);
+color:white;
+font-family:Arial,sans-serif;
+font-size:11px;
 }
 
-.city-hover-tooltip .mapboxgl-popup-content {
-  padding: 6px 10px;
-  border-radius: 4px;
-  border: none;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.18);
-  background: rgba(0,0,0,0.84);
-  color: #fff;
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-  line-height: 1.2;
+.city-hover-tooltip .mapboxgl-popup-tip{
+border-top-color:rgba(0,0,0,0.85)!important;
 }
 
-.city-hover-tooltip .mapboxgl-popup-tip {
-  border-top-color: rgba(0,0,0,0.84) !important;
+.city-hover-tooltip .mapboxgl-popup-close-button{
+display:none;
 }
 
-.city-hover-tooltip .mapboxgl-popup-close-button {
-  display: none;
-}
-
-/* mobile */
-@media (max-width: 640px) {
-  .mapboxgl-popup {
-    max-width: 320px;
-  }
-
-  .city-popup {
-    padding: 16px 16px 12px;
-  }
-
-  .city-popup__title {
-    font-size: 20px;
-    margin-bottom: 12px;
-  }
-
-  .city-popup__row {
-    grid-template-columns: 120px 1fr;
-    column-gap: 12px;
-    padding: 8px 0;
-  }
-
-  .city-popup__label,
-  .city-popup__value {
-    font-size: 12px;
-  }
-}
 </style>
 </head>
 
 <body>
+
 <div id="map"></div>
 
 <script>
-mapboxgl.accessToken = 'pk.eyJ1IjoiZXZnZW5peWEtZGlnaXRhbCIsImEiOiJjbW1hc2wzbDEwZnh5MnBzOXEzZmQ5Zms4In0.54xcK45nfKeeg-Z6-m7cfg';
 
-const map = new mapboxgl.Map({
-  container: 'map',
-  center: [15, 18],
-  style: 'mapbox://styles/evgeniya-digital/cmmatecv1006q01scb0esdbuu',
-  zoom: 1.1,
-  minZoom: 1.1,
-  maxBounds: [
-    [-180, -85],
-    [180, 85]
-  ]
+mapboxgl.accessToken='pk.eyJ1IjoiZXZnZW5peWEtZGlnaXRhbCIsImEiOiJjbW1hc2wzbDEwZnh5MnBzOXEzZmQ5Zms4In0.54xcK45nfKeeg-Z6-m7cfg';
+
+const map=new mapboxgl.Map({
+container:'map',
+center:[15,18],
+zoom:1.1,
+style:'mapbox://styles/evgeniya-digital/cmmatecv1006q01scb0esdbuu'
 });
 
-map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+map.addControl(new mapboxgl.NavigationControl(),'top-right');
 
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+/* отключаем zoom колесом мыши */
+map.scrollZoom.disable();
+
+
+function escapeHtml(value){
+return String(value ?? '')
+.replace(/&/g,'&amp;')
+.replace(/</g,'&lt;')
+.replace(/>/g,'&gt;')
+.replace(/"/g,'&quot;')
+.replace(/'/g,'&#39;');
 }
 
-function formatValue(value) {
-  if (value === null || value === undefined || value === '') return '—';
-  return escapeHtml(value);
+function formatValue(value){
+if(value===null || value===undefined || value==="")
+return "—";
+return escapeHtml(value);
 }
 
-function normalizeUrl(url) {
-  if (!url) return '';
-  const trimmed = String(url).trim();
-  if (!trimmed) return '';
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  return `https://${trimmed}`;
+function normalizeUrl(url){
+if(!url) return "";
+const trimmed=String(url).trim();
+if(/^https?:\/\//i.test(trimmed)) return trimmed;
+return "https://"+trimmed;
 }
 
-function buildPopupHtml(properties) {
-  const rows = [
-    ['Страна', properties['Country']],
-    ['Анонсирован', properties['Year of project announcement']],
-    ['Тип территории', properties['Category']],
-    ['Статус проекта', properties['Project status']],
-    ['Площадь, км²', properties['Area (km²)']]
-  ];
+function buildPopupHtml(properties){
 
-  const rowsHtml = rows.map(([label, value]) => `
-    <div class="city-popup__row">
-      <div class="city-popup__label">${escapeHtml(label)}</div>
-      <div class="city-popup__value">${formatValue(value)}</div>
-    </div>
-  `).join('');
+const rows=[
 
-  const title = formatValue(properties['Name']);
-  const website = normalizeUrl(properties['website']);
+["Страна",properties["Country"]],
+["Анонсирован",properties["Year of project announcement"]],
+["Тип территории",properties["Category"]],
+["Статус проекта",properties["Project status"]],
+["Площадь, км²",properties["Area (km²)"]]
 
-  const titleHtml = website
-    ? `<a href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer">${title}<span class="city-popup__ext">↗</span></a>`
-    : title;
+];
 
-  return `
-    <div class="city-popup">
-      <h3 class="city-popup__title">${titleHtml}</h3>
-      <div class="city-popup__table">
-        ${rowsHtml}
-      </div>
-    </div>
-  `;
+const rowsHtml=rows.map(([label,value])=>`
+
+<div class="city-popup__row">
+<div class="city-popup__label">${escapeHtml(label)}</div>
+<div class="city-popup__value">${formatValue(value)}</div>
+</div>
+
+`).join("");
+
+const title=formatValue(properties["Name"]);
+const website=normalizeUrl(properties["website"]);
+
+const titleHtml=website
+? `<a href="${escapeHtml(website)}" target="_blank">${title}<span class="city-popup__ext">↗</span></a>`
+: title;
+
+return`
+
+<div class="city-popup">
+
+<h3 class="city-popup__title">${titleHtml}</h3>
+
+<div class="city-popup__table">
+${rowsHtml}
+</div>
+
+</div>
+
+`;
+
 }
 
-let activePopup = null;
-let hoverTooltip = null;
+let popup=null;
+let tooltip=null;
 
-map.on('load', () => {
-  /* делаем точки чуть проще для попадания */
-  map.setPaintProperty(
-    'new-cities-dot',
-    'circle-radius',
-    [
-      'interpolate',
-      ['linear'],
-      ['zoom'],
-      0, 4,
-      6, 6,
-      10, 8
-    ]
-  );
+map.on('load',()=>{
 
-  /* источник и слой для активной синей точки */
-  map.addSource('selected-city', {
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: []
-    }
-  });
+map.setPaintProperty(
+'new-cities-dot',
+'circle-radius',
+[
+'interpolate',
+['linear'],
+['zoom'],
+0,4,
+6,6,
+10,8
+]
+);
 
-  map.addLayer({
-    id: 'selected-city-dot',
-    type: 'circle',
-    source: 'selected-city',
-    paint: {
-      'circle-radius': 7,
-      'circle-color': '#2F6BFF'
-    }
-  });
-
-  /* hover: только подсказка */
-  map.addInteraction('city-hover-enter', {
-    type: 'mouseenter',
-    target: { layerId: 'new-cities-dot' },
-    handler: (e) => {
-      map.getCanvas().style.cursor = 'pointer';
-
-      const feature = e.feature;
-      const coordinates = [...feature.geometry.coordinates];
-      const name = feature.properties?.Name || '';
-
-      if (hoverTooltip) hoverTooltip.remove();
-
-      hoverTooltip = new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false,
-        offset: [0, -12],
-        className: 'city-hover-tooltip'
-      })
-        .setLngLat(coordinates)
-        .setHTML(escapeHtml(name))
-        .addTo(map);
-    }
-  });
-
-  map.addInteraction('city-hover-leave', {
-    type: 'mouseleave',
-    target: { layerId: 'new-cities-dot' },
-    handler: () => {
-      map.getCanvas().style.cursor = '';
-
-      if (hoverTooltip) {
-        hoverTooltip.remove();
-        hoverTooltip = null;
-      }
-    }
-  });
-
-  /* click: popup */
-  map.addInteraction('city-click-popup', {
-    type: 'click',
-    target: { layerId: 'new-cities-dot' },
-    handler: (e) => {
-      const feature = e.feature;
-      const coordinates = [...feature.geometry.coordinates];
-      const properties = feature.properties || {};
-
-      if (hoverTooltip) {
-        hoverTooltip.remove();
-        hoverTooltip = null;
-      }
-
-      map.getSource('selected-city').setData({
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates
-            },
-            properties: {}
-          }
-        ]
-      });
-
-      if (activePopup) {
-        activePopup.remove();
-      }
-
-      activePopup = new mapboxgl.Popup({
-        closeButton: true,
-        closeOnClick: false,
-        offset: [0, -14],
-        maxWidth: '440px'
-      })
-        .setLngLat(coordinates)
-        .setHTML(buildPopupHtml(properties))
-        .addTo(map);
-
-      activePopup.on('close', () => {
-        map.getSource('selected-city').setData({
-          type: 'FeatureCollection',
-          features: []
-        });
-        activePopup = null;
-      });
-    }
-  });
+map.addSource('selected-city',{
+type:'geojson',
+data:{
+type:'FeatureCollection',
+features:[]
+}
 });
 
-window.addEventListener('resize', () => {
-  map.resize();
+map.addLayer({
+id:'selected-city-dot',
+type:'circle',
+source:'selected-city',
+paint:{
+'circle-radius':7,
+'circle-color':'#2F6BFF'
+}
 });
+
+
+map.addInteraction("hover-city",{
+
+type:"mouseenter",
+target:{layerId:"new-cities-dot"},
+
+handler:(e)=>{
+
+map.getCanvas().style.cursor='pointer';
+
+const feature=e.feature;
+const coordinates=[...feature.geometry.coordinates];
+const name=feature.properties.Name;
+
+if(tooltip) tooltip.remove();
+
+tooltip=new mapboxgl.Popup({
+closeButton:false,
+closeOnClick:false,
+offset:[0,-10],
+className:"city-hover-tooltip"
+})
+.setLngLat(coordinates)
+.setHTML(name)
+.addTo(map);
+
+}
+
+});
+
+map.addInteraction("leave-city",{
+
+type:"mouseleave",
+target:{layerId:"new-cities-dot"},
+
+handler:()=>{
+
+map.getCanvas().style.cursor='';
+
+if(tooltip){
+tooltip.remove();
+tooltip=null;
+}
+
+}
+
+});
+
+
+map.addInteraction("click-city",{
+
+type:"click",
+target:{layerId:"new-cities-dot"},
+
+handler:(e)=>{
+
+const feature=e.feature;
+const coordinates=[...feature.geometry.coordinates];
+const properties=feature.properties;
+
+map.getSource('selected-city').setData({
+
+type:'FeatureCollection',
+
+features:[{
+
+type:'Feature',
+
+geometry:{
+type:'Point',
+coordinates
+}
+
+}]
+
+});
+
+if(popup) popup.remove();
+
+popup=new mapboxgl.Popup({
+
+offset:[0,-14],
+maxWidth:'420px'
+
+})
+.setLngLat(coordinates)
+.setHTML(buildPopupHtml(properties))
+.addTo(map);
+
+}
+
+});
+
+});
+
 </script>
+
 </body>
 </html>
