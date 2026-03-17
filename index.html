@@ -119,36 +119,46 @@
     flex:0 0 auto;
   }
 
+  /* ======================================================================
+     ВЕРХНИЕ КНОПКИ (табы с превью-картинками)
+     ====================================================================== */
+
   .tabs{
     display:grid;
     grid-template-columns: repeat(4, minmax(140px, 1fr));
-    gap:0;
+    gap:0;                  /* РАССТОЯНИЕ МЕЖДУ КНОПКАМИ: поменяй 0 на нужное, например 5px или 10px */
     align-items:start;
     margin:0;
   }
 
+  /* --- Стиль НЕАКТИВНОЙ кнопки (по умолчанию) --- */
   .tab{
-    border:1px solid var(--line);
-    background:var(--panel-inactive);
+    border:1px solid var(--line) !important;
+    background:var(--panel-inactive) !important;   /* Цвет фона неактивной кнопки (сейчас светло-серый #f2f2f2) */
     cursor:pointer;
     padding:0;
     text-align:left;
     color:inherit;
+    -webkit-appearance:none;
+    -moz-appearance:none;
     appearance:none;
     border-radius:var(--radius);
     margin:0;
     overflow:hidden;
   }
 
+  /* --- Стиль АКТИВНОЙ (нажатой) кнопки --- */
+  /* При клике кнопка получает класс is-active и становится белой */
   .tab.is-active{
-    background:#ffffff !important;
+    background:#ffffff !important;    /* Цвет фона активной кнопки — белый */
     border-color:var(--line);
   }
 
+  /* --- Область с превью-картинкой внутри кнопки --- */
   .tab-preview{
     position:relative;
-    height:70px;
-    background-color:var(--preview);
+    height:70px;            /* ВЫСОТА КНОПОК: поменяй это число, чтобы изменить высоту верхних кнопок (сейчас 70px) */
+    /*background-color:var(--preview);*/
     background-size:contain;
     background-position:center center;
     background-repeat:no-repeat;
@@ -184,12 +194,13 @@
     font-family:var(--font-main);
   }
 
+  /* --- Обёртка карты --- */
   .map-wrap{
     position:relative;
     flex:1 1 auto;
     min-height:300px;
     padding:0;
-    margin:10px;
+    margin:10px;            /* РАССТОЯНИЕ МЕЖДУ КНОПКАМИ И КАРТОЙ: поменяй верхнее значение, например margin:20px 10px 10px 10px; */
   }
 
   #map{
@@ -372,6 +383,7 @@ const MODES = {
       'new city': '#C78B28',
       'satellite city': '#FEC042'
     },
+    // Подписи в легенде для «Тип города» — меняй текст в label на нужный русский вариант
     legend: [
       { label: 'новый город', color: '#C78B28' },
       { label: 'город-спутник', color: '#FEC042' }
@@ -384,17 +396,23 @@ const MODES = {
     type: 'categorical',
     property: 'Project status',
     preview: './previews/project-status.png',
+    // ВАЖНО: ключи в colors (слева) — это значения из данных, их НЕЛЬЗЯ менять!
+    // Они должны совпадать с тем, что приходит из таблицы/данных карты.
     colors: {
       'active': '#ACCA71',
       'implemented': '#4984AC',
       'speculative': '#B3B3B3',
       'under development': '#FEA54D'
     },
+    // КАК ПЕРЕИМЕНОВАТЬ ПОДПИСИ В ЛЕГЕНДЕ:
+    // Меняй только текст в label (в кавычках после слова label).
+    // Например, чтобы вместо "active" было "Активный" — замени 'active' на 'Активный'.
+    // Ключи в colors выше трогать НЕЛЬЗЯ — они привязаны к данным.
     legend: [
-      { label: 'active', color: '#ACCA71' },
-      { label: 'implemented', color: '#4984AC' },
-      { label: 'speculative', color: '#B3B3B3' },
-      { label: 'under development', color: '#FEA54D' }
+      { label: 'active', color: '#ACCA71' },               // <- замени 'active' на 'Активный'
+      { label: 'implemented', color: '#4984AC' },           // <- замени 'implemented' на 'Реализован'
+      { label: 'speculative', color: '#B3B3B3' },           // <- замени 'speculative' на 'Спекулятивный'
+      { label: 'under development', color: '#FEA54D' }      // <- замени 'under development' на 'В разработке'
     ]
   },
   area: {
