@@ -49,9 +49,7 @@
   }
 
   .top-ui{
-    display:grid;
-    grid-template-columns: 200px 1fr;
-    gap:10px;
+    display:flex;
     padding:0;
     align-items:start;
     z-index:2;
@@ -59,15 +57,26 @@
     margin:0;
   }
 
+  /* --- Легенда: плавает поверх карты в левом верхнем углу --- */
   .legend-panel{
-    min-height:70px;
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:10;
     background:var(--panel);
     border:none;
-    padding:6px 10px 6px 0;
+    padding:8px 12px;
     margin:0;
     display:flex;
     flex-direction:column;
     justify-content:flex-start;
+    border-radius:var(--radius);
+    transition:opacity 0.25s ease;
+  }
+
+  /* При наведении мыши легенда становится полупрозрачной, чтобы не мешала смотреть карту */
+  .legend-panel:hover{
+    opacity:0.25;
   }
 
   .legend-title{
@@ -129,6 +138,7 @@
     gap:0;                  /* РАССТОЯНИЕ МЕЖДУ КНОПКАМИ: поменяй 0 на нужное, например 5px или 10px */
     align-items:start;
     margin:0;
+    flex:1;
   }
 
   /* --- Стиль НЕАКТИВНОЙ кнопки (по умолчанию) --- */
@@ -325,16 +335,11 @@
     }
 
     .top-ui{
-      grid-template-columns:1fr;
+      display:flex;
     }
 
     .tabs{
       grid-template-columns: repeat(2, minmax(140px, 1fr));
-    }
-
-    .legend-panel{
-      min-height:auto;
-      padding-right:0;
     }
 
     .map-wrap{
@@ -347,16 +352,15 @@
 <body>
 <div class="app">
   <div class="top-ui">
+    <div class="tabs" id="tabs"></div>
+  </div>
+
+  <div class="map-wrap">
     <div class="legend-panel">
       <h3 class="legend-title" id="legend-title">Все города</h3>
       <div class="legend-items" id="legend-items"></div>
       <div class="legend-size-row" id="legend-size-row" style="display:none;"></div>
     </div>
-
-    <div class="tabs" id="tabs"></div>
-  </div>
-
-  <div class="map-wrap">
     <div id="map"></div>
   </div>
 </div>
